@@ -1,48 +1,185 @@
 {% extends 'base.html' %}
 
-{% block title %}Все заведения{% endblock %}
+{% block title %}Все заведения Нижнего Новгорода - NN FoodGuide{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Все заведения</h1>
-
-<div class="mb-4">
-    <a href="/places/add/" class="btn btn-success">
-        <i class="fas fa-plus me-1"></i>Добавить заведение
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-5 fw-bold">Заведения Нижнего Новгорода</h1>
+    <a href="/places/add/" class="btn btn-primary btn-lg">
+        <i class="fas fa-plus me-2"></i>Добавить
     </a>
 </div>
 
-<div class="row">
+<div class="filter-section mb-5">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" placeholder="Поиск по названию..." id="searchInput">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="categoryFilter">
+                <option value="">Все категории</option>
+                <option value="1">Рестораны</option>
+                <option value="2">Кафе</option>
+                <option value="3">Фастфуд</option>
+                <option value="4">Бары</option>
+                <option value="5">Кофейни</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="priceFilter">
+                <option value="">Любая цена</option>
+                <option value="1">💰 Бюджетно</option>
+                <option value="2">💰💰 Средние цены</option>
+                <option value="3">💰💰💰 Дорого</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select class="form-select" id="sortFilter">
+                <option value="name">По названию</option>
+                <option value="rating">По рейтингу</option>
+                <option value="price">По цене</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Список заведений -->
+<div class="row" id="placesContainer">
     {% for place in places %}
-    <div class="col-md-4 mb-4">
-        <div class="card place-card">
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="place-card card h-100">
+            {% if place.image %}
+            <img src="{{ place.image.url }}" class="card-img-top" alt="{{ place.name }}">
+            {% else %}
+            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" 
+                 class="card-img-top" alt="{{ place.name }}">
+            {% endif %}
+            
             <div class="card-body">
-                <h5 class="card-title">{{ place.name }}</h5>
-                <p class="text-muted">
-                    <i class="fas fa-map-marker-alt"></i> {{ place.address|truncatechars:30 }}
-                </p>
-                <p>
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="card-title mb-0">{{ place.name }}</h5>
                     <span class="badge bg-primary">{{ place.category.name }}</span>
-                </p>
-                <div class="rating-stars">
-                    {% for i in "12345" %}
-                        {% if forloop.counter <= place.average_rating %}
-                            <i class="fas fa-star"></i>
-                        {% else %}
-                            <i class="far fa-star"></i>
-                        {% endif %}
-                    {% endfor %}
-                    <span class="ms-1">{{ place.average_rating|floatformat:1 }}</span>
                 </div>
-                <a href="/places/{{ place.id }}/" class="btn btn-outline-primary mt-2">Подробнее</a>
+                
+                <p class="card-text text-muted mb-3">
+                    <i class="fas fa-map-marker-alt me-1"></i>{{ place.address|truncatechars:40 }}
+                </p>
+                
+                {% if place.description %}
+                <p class="card-text mb-3">{{ place.description|truncatechars:100 }}</p>
+                {% endif %}
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="rating-stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= place.average_rating %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="ms-1">{{ place.average_rating|floatformat:1 }}</span>
+                    </div>
+                    <span class="price-level">
+                        {{ place.get_price_level_display }}
+                    </span>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <a href="/places/{{ place.id }}/" class="btn btn-outline-primary flex-grow-1">
+                        <i class="fas fa-info-circle me-1"></i>Подробнее
+                    </a>
+                    <button class="btn btn-outline-secondary" title="Добавить в избранное">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-transparent border-top">
+                <small class="text-muted">
+                    <i class="far fa-comment me-1"></i>{{ place.reviews.count }} отзывов
+                </small>
             </div>
         </div>
     </div>
     {% empty %}
     <div class="col-12">
-        <div class="alert alert-info">
-            Пока нет заведений. <a href="/places/add/">Добавьте первое!</a>
+        <div class="text-center py-5">
+            <i class="fas fa-utensils fa-4x text-muted mb-4"></i>
+            <h3>Заведения не найдены</h3>
+            <p class="text-muted mb-4">Попробуйте изменить параметры поиска или добавьте новое заведение</p>
+            <a href="/places/add/" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Добавить первое заведение
+            </a>
         </div>
     </div>
     {% endfor %}
 </div>
+
+<!-- Пагинация (пока заглушка) -->
+{% if places|length > 0 %}
+<nav aria-label="Навигация по страницам" class="mt-5">
+    <ul class="pagination justify-content-center">
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Назад</a>
+        </li>
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item">
+            <a class="page-link" href="#">Вперед</a>
+        </li>
+    </ul>
+</nav>
+{% endif %}
+
+<style>
+    .badge {
+        font-size: 0.8rem;
+        padding: 0.4em 0.8em;
+    }
+</style>
+
+{% block extra_js %}
+<script>
+// Простой фильтр на JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const priceFilter = document.getElementById('priceFilter');
+    const placesContainer = document.getElementById('placesContainer');
+    
+    function filterPlaces() {
+        const searchText = searchInput.value.toLowerCase();
+        const selectedCategory = categoryFilter.value;
+        const selectedPrice = priceFilter.value;
+        
+        const placeCards = placesContainer.getElementsByClassName('col-lg-4');
+        
+        for (let card of placeCards) {
+            const name = card.querySelector('.card-title').textContent.toLowerCase();
+            const category = card.querySelector('.badge').textContent;
+            const price = card.querySelector('.price-level').textContent;
+            
+            let show = true;
+            
+            if (searchText && !name.includes(searchText)) {
+                show = false;
+            }
+            
+          
+            
+            card.style.display = show ? 'block' : 'none';
+        }
+    }
+    
+    searchInput.addEventListener('input', filterPlaces);
+    categoryFilter.addEventListener('change', filterPlaces);
+    priceFilter.addEventListener('change', filterPlaces);
+});
+</script>
+{% endblock %}
 {% endblock %}
