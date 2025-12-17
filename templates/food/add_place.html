@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Добавить новое заведение</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Функция добавления находится в разработке.
+                    Пожалуйста, добавляйте заведения через <a href="/admin/">админ-панель</a>.
+                </p>
+                <a href="/admin/food/place/add/" class="btn btn-primary">
+                    <i class="fas fa-external-link-alt me-1"></i>Перейти в админку
+                </a>
+                <a href="/places/" class="btn btn-secondary">Назад к списку</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

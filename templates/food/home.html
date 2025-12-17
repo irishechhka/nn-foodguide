@@ -1,10 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-4">Добро пожаловать в NN FoodGuide!</h1>
+    <p class="lead">Найдите лучшие места, где можно поесть в Нижнем Новгороде</p>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                    <h3>Найдите</h3>
+                    <p>Ищите заведения по категориям и отзывам</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <i class="fas fa-star fa-3x text-warning mb-3"></i>
+                    <h3>Оцените</h3>
+                    <p>Оставляйте отзывы и оценки</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <i class="fas fa-plus fa-3x text-success mb-3"></i>
+                    <h3>Добавьте</h3>
+                    <p>Добавляйте новые места</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <a href="/places/" class="btn btn-primary btn-lg">Смотреть все заведения</a>
+        <a href="/places/add/" class="btn btn-success btn-lg">Добавить заведение</a>
+    </div>
+</div>
+{% endblock %}

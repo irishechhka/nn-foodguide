@@ -1,193 +1,27 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ place.name }} - NN FoodGuide{% endblock %}
-
 {% block content %}
-<!-- Хлебные крошки -->
-<nav aria-label="breadcrumb" class="mb-4">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'place_list' %}">Все заведения</a></li>
-        <li class="breadcrumb-item active">{{ place.name }}</li>
-    </ol>
-</nav>
+<div class="card">
+    <div class="card-body">
+        <h1>{{ place.name }}</h1>
+        <p><strong>Адрес:</strong> {{ place.address }}</p>
+        <p><strong>Категория:</strong> {{ place.category.name }}</p>
+        <p><strong>Описание:</strong> {{ place.description }}</p>
 
-<div class="row">
-    <!-- Левая колонка - информация -->
-    <div class="col-lg-8">
-        <div class="card mb-4">
-            {% if place.image %}
-            <img src="{{ place.image.url }}" class="card-img-top" alt="{{ place.name }}" style="max-height: 400px; object-fit: cover;">
-            {% endif %}
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h1 class="card-title">{{ place.name }}</h1>
-                        <span class="badge bg-primary fs-6">{{ place.category.name }}</span>
-                    </div>
-                    <div class="text-end">
-                        <div class="display-6 text-warning">
-                            {{ place.average_rating|floatformat:1 }}
-                        </div>
-                        <small class="text-muted">рейтинг</small>
-                    </div>
-                </div>
-
-                <hr>
-
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <h5><i class="fas fa-info-circle text-primary me-2"></i>Информация</h5>
-                        <ul class="list-unstyled">
-                            <li class="mb-2">
-                                <i class="fas fa-map-marker-alt me-2"></i>
-                                <strong>Адрес:</strong> {{ place.address }}
-                            </li>
-                            {% if place.phone %}
-                            <li class="mb-2">
-                                <i class="fas fa-phone me-2"></i>
-                                <strong>Телефон:</strong> {{ place.phone }}
-                            </li>
-                            {% endif %}
-                            {% if place.website %}
-                            <li class="mb-2">
-                                <i class="fas fa-globe me-2"></i>
-                                <strong>Сайт:</strong>
-                                <a href="{{ place.website }}" target="_blank">{{ place.website }}</a>
-                            </li>
-                            {% endif %}
-                            {% if place.opening_hours %}
-                            <li class="mb-2">
-                                <i class="fas fa-clock me-2"></i>
-                                <strong>Часы работы:</strong> {{ place.opening_hours }}
-                            </li>
-                            {% endif %}
-                            <li class="mb-2">
-                                <i class="fas fa-ruble-sign me-2"></i>
-                                <strong>Цены:</strong> {{ place.get_price_level_display }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <h5><i class="fas fa-star text-warning me-2"></i>Рейтинг</h5>
-                        <div class="text-center my-3">
-                            <div class="display-4 text-warning">
-                                {{ place.average_rating|floatformat:1 }}/5
-                            </div>
-                            <div class="rating-stars fs-3">
-                                {% for i in "12345" %}
-                                    {% if forloop.counter <= place.average_rating %}
-                                        <i class="fas fa-star"></i>
-                                    {% else %}
-                                        <i class="far fa-star"></i>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                            <p class="text-muted mt-2">
-                                На основе {{ place.reviews.count }} отзывов
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {% if place.description %}
-                <div class="mt-4">
-                    <h5><i class="fas fa-align-left text-primary me-2"></i>Описание</h5>
-                    <p class="card-text">{{ place.description|linebreaks }}</p>
-                </div>
+        <div class="rating-stars fs-4">
+            {% for i in "12345" %}
+                {% if forloop.counter <= place.average_rating %}
+                    <i class="fas fa-star"></i>
+                {% else %}
+                    <i class="far fa-star"></i>
                 {% endif %}
-            </div>
+            {% endfor %}
+            <span class="ms-2">{{ place.average_rating|floatformat:1 }}/5</span>
         </div>
 
-        <!-- Отзывы -->
-        <h3 class="mb-4">Отзывы ({{ place.reviews.count }})</h3>
-
-        {% if reviews %}
-            {% for review in reviews %}
-            <div class="card mb-3 review-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <h5 class="card-title">{{ review.author_name }}</h5>
-                        <div class="text-warning">
-                            {% for i in "12345" %}
-                                {% if forloop.counter <= review.rating %}
-                                    <i class="fas fa-star"></i>
-                                {% else %}
-                                    <i class="far fa-star"></i>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <p class="text-muted">
-                        <small>{{ review.created_at|date:"d.m.Y H:i" }}</small>
-                    </p>
-                    <p class="card-text">{{ review.text|linebreaks }}</p>
-                </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <div class="alert alert-info">
-                Пока нет отзывов. Будьте первым!
-            </div>
-        {% endif %}
-    </div>
-
-    <!-- Правая колонка - форма отзыва -->
-    <div class="col-lg-4">
-        <div class="card sticky-top" style="top: 20px;">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="fas fa-comment me-2"></i>Оставить отзыв</h4>
-            </div>
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-
-                    <div class="mb-3">
-                        <label for="id_author_name" class="form-label">Ваше имя*</label>
-                        {{ form.author_name }}
-                        {% if form.author_name.errors %}
-                        <div class="text-danger">{{ form.author_name.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Оценка*</label>
-                        <div class="rating-input">
-                            {% for choice in form.rating %}
-                            <div class="form-check form-check-inline">
-                                {{ choice.tag }}
-                                <label class="form-check-label" for="{{ choice.id_for_label }}">
-                                    {{ choice.choice_label }} ⭐
-                                </label>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% if form.rating.errors %}
-                        <div class="text-danger">{{ form.rating.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="id_text" class="form-label">Текст отзыва*</label>
-                        {{ form.text }}
-                        {% if form.text.errors %}
-                        <div class="text-danger">{{ form.text.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-paper-plane me-2"></i>Отправить отзыв
-                    </button>
-                </form>
-            </div>
+        <div class="mt-4">
+            <a href="/places/" class="btn btn-secondary">Назад к списку</a>
         </div>
     </div>
 </div>
-
-<style>
-.rating-input .form-check-input:checked + .form-check-label {
-    font-weight: bold;
-    color: #ffc107;
-}
-</style>
 {% endblock %}

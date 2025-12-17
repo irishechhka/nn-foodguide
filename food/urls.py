@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 
-app_name = 'food'
+#app_name = 'food'  # Это опционально, можно убрать если мешает
 
 urlpatterns = [
     path('', views.home, name='home'),

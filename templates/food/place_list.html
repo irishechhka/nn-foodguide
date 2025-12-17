@@ -1,98 +1,46 @@
 {% extends 'base.html' %}
 
-{% block title %}Все заведения - NN FoodGuide{% endblock %}
+{% block title %}Все заведения{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Все заведения</h1>
-    <a href="{% url 'add_place' %}" class="btn btn-success">
-        <i class="fas fa-plus me-1"></i>Добавить
+<h1 class="mb-4">Все заведения</h1>
+
+<div class="mb-4">
+    <a href="/places/add/" class="btn btn-success">
+        <i class="fas fa-plus me-1"></i>Добавить заведение
     </a>
 </div>
 
-<!-- Фильтры и поиск -->
-<div class="row mb-4">
-    <div class="col-md-8">
-        <form method="get" class="row g-2">
-            <div class="col-md-4">
-                <select name="category" class="form-select" onchange="this.form.submit()">
-                    <option value="">Все категории</option>
-                    {% for category in categories %}
-                    <option value="{{ category.id }}"
-                            {% if selected_category == category.id %}selected{% endif %}>
-                        {{ category.name }} ({{ category.place_set.count }})
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-4">
-                <select name="sort" class="form-select" onchange="this.form.submit()">
-                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>По названию</option>
-                    <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>По рейтингу</option>
-                    <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Цена: низкая → высокая</option>
-                    <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Цена: высокая → низкая</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <div class="input-group">
-                    <input type="text" name="search" class="form-control"
-                           placeholder="Поиск..." value="{{ search_query }}">
-                    <button class="btn btn-outline-primary" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Список заведений -->
 <div class="row">
     {% for place in places %}
-    <div class="col-lg-4 col-md-6 mb-4">
-        <div class="place-card card h-100">
-            {% if place.image %}
-            <img src="{{ place.image.url }}" class="card-img-top" alt="{{ place.name }}" style="height: 200px; object-fit: cover;">
-            {% endif %}
+    <div class="col-md-4 mb-4">
+        <div class="card place-card">
             <div class="card-body">
                 <h5 class="card-title">{{ place.name }}</h5>
-                <span class="badge bg-primary">{{ place.category.name }}</span>
-                <p class="card-text mt-2">
-                    <small class="text-muted">
-                        <i class="fas fa-map-marker-alt me-1"></i>{{ place.address|truncatechars:40 }}
-                    </small>
+                <p class="text-muted">
+                    <i class="fas fa-map-marker-alt"></i> {{ place.address|truncatechars:30 }}
                 </p>
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <div class="rating-stars">
-                        {% with rating=place.average_rating %}
-                        {% for i in "12345" %}
-                            {% if forloop.counter <= rating %}
-                                <i class="fas fa-star"></i>
-                            {% else %}
-                                <i class="far fa-star"></i>
-                            {% endif %}
-                        {% endfor %}
-                        <span class="ms-1">{{ rating|floatformat:1 }}</span>
-                        {% endwith %}
-                    </div>
-                    <span class="price-level">
-                        {{ place.get_price_level_display }}
-                    </span>
+                <p>
+                    <span class="badge bg-primary">{{ place.category.name }}</span>
+                </p>
+                <div class="rating-stars">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= place.average_rating %}
+                            <i class="fas fa-star"></i>
+                        {% else %}
+                            <i class="far fa-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                    <span class="ms-1">{{ place.average_rating|floatformat:1 }}</span>
                 </div>
-            </div>
-            <div class="card-footer bg-transparent">
-                <a href="{% url 'place_detail' place.id %}" class="btn btn-outline-primary w-100">
-                    Подробнее
-                </a>
+                <a href="/places/{{ place.id }}/" class="btn btn-outline-primary mt-2">Подробнее</a>
             </div>
         </div>
     </div>
     {% empty %}
     <div class="col-12">
-        <div class="alert alert-warning text-center py-5">
-            <i class="fas fa-search fa-3x mb-3"></i>
-            <h4>Заведения не найдены</h4>
-            <p>Попробуйте изменить критерии поиска или <a href="{% url 'add_place' %}">добавьте новое заведение</a></p>
+        <div class="alert alert-info">
+            Пока нет заведений. <a href="/places/add/">Добавьте первое!</a>
         </div>
     </div>
     {% endfor %}
