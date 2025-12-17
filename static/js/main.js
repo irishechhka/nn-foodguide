@@ -1,5 +1,5 @@
 
-//test git
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('NN FoodGuide loaded!');
     
